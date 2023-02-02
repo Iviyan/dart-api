@@ -1,10 +1,3 @@
-/*
-drop table notes;
-drop table refresh_tokens;
-drop table users;
-drop table categories;
-*/
-
 create table users
 (
     id serial PRIMARY KEY,
@@ -29,7 +22,6 @@ create table categories
     name text not null unique -- varchar(100)
 );
 
-drop table notes;
 create table notes
 (
     id serial primary key,
@@ -58,16 +50,3 @@ create table notes_history
 	created_at timestamp primary key default now(), -- timestamptz
 	text text not null
 );
-
-/*
-
-insert into categories(name) values ('Покупки');
-
-insert into notes(name, text, category_id, created_at)
-values ('Яблоко', '2 штуки', 1, now());
-
-select * from notes;
-
-update notes set text = '3 штуки' where id = 1;
-
-*/
