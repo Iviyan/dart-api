@@ -42,8 +42,8 @@ class NewNote implements Serializable {
 
   @override
   void readFromMap(Map<String, dynamic> object) {
-    text = object["text"] as String;
-    name = object["name"] as String;
+    text = object["text"] as String?;
+    name = object["name"] as String?;
     categoryId = object["categoryId"] as int;
   }  
 }

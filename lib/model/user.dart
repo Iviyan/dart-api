@@ -46,8 +46,8 @@ class LoginRequest implements Serializable {
 
   @override
   void readFromMap(Map<String, dynamic> object) {
-    login = object["login"] as String;
-    password = object["password"] as String;
+    login = object["login"] as String?;
+    password = object["password"] as String?;
   }
 }
 
