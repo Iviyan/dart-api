@@ -6,7 +6,13 @@ import 'package:conduit_common/src/openapi/documentable.dart';
 import 'package:webapp/model/category.dart';
 import 'package:webapp/model/user.dart';
 
-class Note extends ManagedObject<_Note> implements _Note {}
+class Note extends ManagedObject<_Note> implements _Note {
+  Map<String, dynamic>? asResponse() => {
+    "id": id, "name": name, "text": text,
+    "category": category?.asMap(), "user": user?.asMap(),
+    "createdAt": createdAt?.toIso8601String(), "editedAt": editedAt?.toIso8601String(), "isDeleted": isDeleted
+  };
+}
 
 @Table(name: "notes", useSnakeCaseColumnName: true)
 class _Note { 

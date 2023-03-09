@@ -27,7 +27,7 @@ class NotesController extends ResourceController {
 
       await log("Note ${note.id} was created");
 
-      return Response.ok(note);
+      return Response.ok(note.asResponse());
     } on QueryException catch (e) {
       return AppResponse.serverError(e, message: 'Error creating a note');
     }
@@ -53,7 +53,7 @@ class NotesController extends ResourceController {
       
       final notes = await qNote.fetch(); 
 
-      return Response.ok(notes);
+      return Response.ok(notes.map((n) => n.asResponse()).toList());
     } on QueryException catch (e) {
       return AppResponse.serverError(e);
     }
@@ -69,7 +69,7 @@ class NotesController extends ResourceController {
         ..join(object: (x) => x.category);
       final note = await qNote.fetchOne();
 
-      return note != null ? Response.ok(note) : AppResponse.notFound();
+      return note != null ? Response.ok(note.asResponse()) : AppResponse.notFound();
     } on QueryException catch (e) {
       return AppResponse.serverError(e);
     }
@@ -99,11 +99,12 @@ class NotesController extends ResourceController {
         ..values.category = category
       ;
 
-      final updatedNote = await qCreateNote.update(); 
+      final updatedNote = (await qCreateNote.update())[0]; 
+      //final updatedNote = updatedNotes.isNotEmpty ? updatedNotes[0] : null;
 
       await log("Note $id was updated");
 
-      return Response.ok(updatedNote);
+      return Response.ok(updatedNote.asResponse());
     } on QueryException catch (e) {
       return AppResponse.serverError(e, message: 'Error updating a note');
     }
@@ -164,7 +165,7 @@ class NotesController extends ResourceController {
 
       await log("Note $id was restored");
       
-      return Response.ok(restoredNote);
+      return Response.ok(restoredNote?.asResponse());
     } on QueryException catch (e) {
       return AppResponse.serverError(e, message: 'Error restoring a note');
     }
