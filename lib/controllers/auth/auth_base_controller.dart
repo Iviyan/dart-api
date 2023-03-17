@@ -33,8 +33,8 @@ class AuthBaseController extends ResourceController {
     return Tokens(getAccessToken(jwtSecretKey, userId), refreshToken);
   }
 
-  String getAccessToken(String secretKey, int userId) {
-    final accessClaimSet = JwtClaim(maxAge: const Duration(hours: 1), otherClaims: {'id': userId});
+  String getAccessToken(String secretKey, int userId, {Duration duration = const Duration(hours: 1)}) {
+    final accessClaimSet = JwtClaim(maxAge: duration, otherClaims: {'id': userId});
     return issueJwtHS256(accessClaimSet, secretKey);
   }
 

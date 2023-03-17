@@ -27,7 +27,7 @@ class NotesController extends ResourceController {
 
       await log("Note ${note.id} was created");
 
-      return Response.ok(note.asResponse());
+      return getNote(note.id!);
     } on QueryException catch (e) {
       return AppResponse.serverError(e, message: 'Error creating a note');
     }
@@ -36,20 +36,24 @@ class NotesController extends ResourceController {
   @Operation.get()
   Future<Response> getNotes({
     @Bind.query("name") String? name,
+    @Bind.query("include_deleted") String? includeDeleted,
     @Bind.query("count") int count = 0,
     @Bind.query("last_id") int lastId = 0
   }) async {
     try {
       final qNote = Query<Note>(managedContext)
+        ..sortBy((x) => x.id, QuerySortOrder.ascending)
         ..where((x) => x.id).greaterThan(lastId)
         ..fetchLimit = count
-        ..where((x) => x.isDeleted).equalTo(false)
         ..join(object: (x) => x.user)
           .returningProperties((x) => [x.id, x.login, x.name])
         ..join(object: (x) => x.category);
 
       if (name != null)
         qNote.where((x) => x.name).contains(name, caseSensitive: false);
+
+      if (includeDeleted != "true" && includeDeleted != "1")
+        qNote.where((x) => x.isDeleted).equalTo(false);
       
       final notes = await qNote.fetch(); 
 
@@ -104,7 +108,7 @@ class NotesController extends ResourceController {
 
       await log("Note $id was updated");
 
-      return Response.ok(updatedNote.asResponse());
+      return getNote(id);
     } on QueryException catch (e) {
       return AppResponse.serverError(e, message: 'Error updating a note');
     }
@@ -113,7 +117,7 @@ class NotesController extends ResourceController {
   @Operation.delete("id")
   Future<Response> deleteNote(
     @Bind.path("id") int id,
-    {@Bind.query("forever") bool forever = false}
+    {@Bind.query("forever") String? forever}
   ) async {
     final userId = request!.attachments["userId"] as int;
 
@@ -128,7 +132,7 @@ class NotesController extends ResourceController {
 
       final qNoteAction = Query<Note>(managedContext)
         ..where((x) => x.id).equalTo(id);
-      if (forever == true) {
+      if (forever == "true" || forever == "1") {
         await qNoteAction.delete(); 
 
         await log("Note $id was deleted");
