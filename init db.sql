@@ -22,6 +22,8 @@ create table categories
     name text not null unique -- varchar(100)
 );
 
+insert into categories(name) values ('-');
+
 create table notes
 (
     id serial primary key,
